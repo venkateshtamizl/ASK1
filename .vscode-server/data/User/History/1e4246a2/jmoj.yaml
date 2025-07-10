@@ -1,0 +1,12 @@
+version: '3'
+services:
+  asterisk:
+    build: .
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "8088:8088"
+      - "10000-20000:10000-20000/udp"
+    volumes:
+      - ./home/osboxes/App/multi/asteriskdocker/asterisk/configs:/etc/asterisk
+    restart: unless-stopped

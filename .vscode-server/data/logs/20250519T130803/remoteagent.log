@@ -1,0 +1,26 @@
+2025-05-19 13:08:03.783 [info] 
+
+
+
+
+2025-05-19 13:08:03.792 [info] Extension host agent started.
+2025-05-19 13:08:04.867 [info] [<unknown>][44f2c76f][ManagementConnection] New connection established.
+2025-05-19 13:08:04.868 [info] [<unknown>][02934fdf][ExtensionHostConnection] New connection established.
+2025-05-19 13:08:04.923 [info] [<unknown>][02934fdf][ExtensionHostConnection] <254670> Launched Extension Host Process.
+2025-05-19 13:08:28.300 [info] [<unknown>][44f2c76f][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-05-19 13:08:28.317 [info] [<unknown>][02934fdf][ExtensionHostConnection] <254670> Extension Host Process exited with code: 0, signal: null.
+2025-05-19 13:08:28.318 [info] Cancelling previous shutdown timeout
+2025-05-19 13:08:28.318 [info] Last EH closed, waiting before shutting down
+2025-05-19 13:08:31.543 [info] [<unknown>][ebea31dd][ManagementConnection] New connection established.
+2025-05-19 13:08:31.544 [info] [<unknown>][c5b30273][ExtensionHostConnection] New connection established.
+2025-05-19 13:08:31.547 [info] [<unknown>][c5b30273][ExtensionHostConnection] <254741> Launched Extension Host Process.
+2025-05-19 13:13:28.318 [info] New EH opened, aborting shutdown
+2025-05-19 13:34:04.018 [info] [<unknown>][c5b30273][ExtensionHostConnection] The client has reconnected.
+2025-05-19 13:34:04.019 [info] [<unknown>][ebea31dd][ManagementConnection] The client has reconnected.
+2025-05-19 16:04:36.853 [info] [<unknown>][ebea31dd][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-05-19 16:04:36.881 [error] Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-cd4ee3b1c348a13bafd8f9ad8060705f6d4b9cba/server/out/server-main.js:184:1060)
+    at process.emit (node:events:530:35)
+2025-05-19 19:04:49.017 [info] [<unknown>][c5b30273][ExtensionHostConnection] <254741> Extension Host Process exited with code: 0, signal: null.
+2025-05-19 19:04:49.023 [info] Last EH closed, waiting before shutting down
+2025-05-19 19:09:49.025 [info] Last EH closed, shutting down

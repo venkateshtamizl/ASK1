@@ -1,0 +1,47 @@
+2025-05-20 14:17:22.667 [info] 
+
+
+
+
+2025-05-20 14:17:22.686 [info] Extension host agent started.
+2025-05-20 14:17:22.783 [info] [<unknown>][966a9f35][ExtensionHostConnection] New connection established.
+2025-05-20 14:17:22.784 [info] [<unknown>][56dbca6c][ManagementConnection] New connection established.
+2025-05-20 14:17:22.856 [info] ComputeTargetPlatform: linux-x64
+2025-05-20 14:17:22.956 [info] [<unknown>][966a9f35][ExtensionHostConnection] <842277> Launched Extension Host Process.
+2025-05-20 14:17:24.231 [info] ComputeTargetPlatform: linux-x64
+2025-05-20 14:18:31.096 [info] [<unknown>][56dbca6c][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-05-20 14:18:31.119 [info] [<unknown>][966a9f35][ExtensionHostConnection] <842277> Extension Host Process exited with code: 0, signal: null.
+2025-05-20 14:18:31.120 [info] Cancelling previous shutdown timeout
+2025-05-20 14:18:31.120 [info] Last EH closed, waiting before shutting down
+2025-05-20 14:18:44.118 [info] [<unknown>][b8867c6a][ManagementConnection] New connection established.
+2025-05-20 14:18:44.132 [info] [<unknown>][eb16a951][ExtensionHostConnection] New connection established.
+2025-05-20 14:18:44.136 [info] [<unknown>][eb16a951][ExtensionHostConnection] <842655> Launched Extension Host Process.
+2025-05-20 14:23:31.121 [info] New EH opened, aborting shutdown
+2025-05-20 14:23:31.124 [error] Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/server-main.js:190:1060)
+    at process.emit (node:events:536:35)
+2025-05-20 15:27:37.017 [info] [<unknown>][b8867c6a][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-05-20 15:27:40.071 [info] [<unknown>][eb16a951][ExtensionHostConnection] <842655> Extension Host Process exited with code: 0, signal: null.
+2025-05-20 15:27:40.105 [info] Last EH closed, waiting before shutting down
+2025-05-20 15:27:43.478 [info] [<unknown>][3179df91][ManagementConnection] New connection established.
+2025-05-20 15:27:43.497 [info] [<unknown>][d0516986][ExtensionHostConnection] New connection established.
+2025-05-20 15:27:43.576 [info] [<unknown>][d0516986][ExtensionHostConnection] <919425> Launched Extension Host Process.
+2025-05-20 15:27:45.803 [error] CodeExpectedError: Could not find pty 33 on pty host
+    at I.W (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:46:6392)
+    at I.updateTitle (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:46:1839)
+    at s.<computed> (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:45:2962)
+    at Object.call (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:28:4204)
+    at ul.s (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:26:81207)
+    at ul.q (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80730)
+    at ps.value (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80132)
+    at C.B (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2373)
+    at C.fire (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2591)
+    at process.x (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/server/out/vs/platform/terminal/node/ptyHostMain.js:24:29911)
+    at process.emit (node:events:524:28)
+    at emit (node:internal/child_process:950:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+2025-05-20 15:30:51.109 [info] [<unknown>][3179df91][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-05-20 15:30:51.134 [info] [<unknown>][d0516986][ExtensionHostConnection] <919425> Extension Host Process exited with code: 0, signal: null.
+2025-05-20 15:30:51.134 [info] Cancelling previous shutdown timeout
+2025-05-20 15:30:51.134 [info] Last EH closed, waiting before shutting down
+2025-05-20 15:35:51.135 [info] Last EH closed, shutting down

@@ -1,0 +1,61 @@
+*
+* Visual Studio Code Server
+*
+* By using the software, you agree to
+* the Visual Studio Code Server License Terms (https://aka.ms/vscode-server-license) and
+* the Microsoft Privacy Statement (https://privacy.microsoft.com/en-US/privacystatement).
+*
+Server bound to /tmp/code-b4b11a4a-7464-48bb-8a2d-066c00c6b84e
+Extension host agent listening on /tmp/code-b4b11a4a-7464-48bb-8a2d-066c00c6b84e
+
+[11:46:45] 
+
+
+
+
+[11:46:45] Extension host agent started.
+[11:46:45] Started initializing default profile extensions in extensions installation folder. file:///home/atgin-srv-ask/.vscode-server/extensions
+[11:46:45] ComputeTargetPlatform: linux-x64
+[11:46:45] Completed initializing default profile extensions in extensions installation folder. file:///home/atgin-srv-ask/.vscode-server/extensions
+[11:46:45] [<unknown>][93e87a46][ExtensionHostConnection] New connection established.
+[11:46:45] [<unknown>][341bd721][ManagementConnection] New connection established.
+[11:46:46] [<unknown>][93e87a46][ExtensionHostConnection] <226664> Launched Extension Host Process.
+[11:46:47] ComputeTargetPlatform: linux-x64
+New EH opened, aborting shutdown
+[11:51:45] New EH opened, aborting shutdown
+[11:52:03] [<unknown>][341bd721][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[11:52:03] [<unknown>][93e87a46][ExtensionHostConnection] <226664> Extension Host Process exited with code: 0, signal: null.
+Last EH closed, waiting before shutting down
+[11:52:03] Last EH closed, waiting before shutting down
+[11:52:09] [<unknown>][6bae0e04][ManagementConnection] New connection established.
+[11:52:09] [<unknown>][13427a31][ExtensionHostConnection] New connection established.
+[11:52:09] [<unknown>][13427a31][ExtensionHostConnection] <227225> Launched Extension Host Process.
+rejected promise not handled within 1 second: CodeExpectedError: Could not find pty 5 on pty host
+stack trace: CodeExpectedError: Could not find pty 5 on pty host
+    at I.W (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:46:6392)
+    at I.updateTitle (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:46:1839)
+    at s.<computed> (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:45:2962)
+    at Object.call (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:28:4204)
+    at ul.s (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:81207)
+    at ul.q (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80730)
+    at ps.value (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80132)
+    at C.B (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2373)
+    at C.fire (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2591)
+    at process.x (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:24:29911)
+    at process.emit (node:events:524:28)
+    at emit (node:internal/child_process:950:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+[11:52:11] Error [CodeExpectedError]: Could not find pty 5 on pty host
+    at I.W (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:46:6392)
+    at I.updateTitle (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:46:1839)
+    at s.<computed> (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:45:2962)
+    at Object.call (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:28:4204)
+    at ul.s (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:81207)
+    at ul.q (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80730)
+    at ps.value (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:80132)
+    at C.B (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2373)
+    at C.fire (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:26:2591)
+    at process.x (file:///home/atgin-srv-ask/.vscode-server/cli/servers/Stable-19e0f9e681ecb8e5c09d8784acaa601316ca4571/server/out/vs/platform/terminal/node/ptyHostMain.js:24:29911)
+    at process.emit (node:events:524:28)
+    at emit (node:internal/child_process:950:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)

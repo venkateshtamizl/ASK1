@@ -1,0 +1,12 @@
+2025-05-19 13:08:35.389 [info] Extension host with pid 254741 started
+2025-05-19 13:08:35.398 [info] Lock '/home/atgin-srv-ask/.vscode-server/data/User/workspaceStorage/f326705f18910687526830a67b54f6c0/vscode.lock': Lock acquired.
+2025-05-19 13:08:38.986 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: false, activationEvent: '*'
+2025-05-19 13:08:39.322 [info] ExtensionService#_doActivateExtension vscode.github, startup: false, activationEvent: '*'
+2025-05-19 13:08:40.141 [info] Eager extensions activated
+2025-05-19 13:08:40.141 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-05-19 13:08:40.141 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-05-19 13:34:04.675 [info] ExtensionService#_doActivateExtension vscode.git, startup: false, activationEvent: 'api', root cause: vscode.github
+2025-05-19 14:18:21.380 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-05-19 19:04:48.954 [info] Extension host terminating: renderer disconnected for too long (1)
+2025-05-19 19:04:48.959 [info] Lock '/home/atgin-srv-ask/.vscode-server/data/User/workspaceStorage/f326705f18910687526830a67b54f6c0/vscode.lock': Marking the lockfile as scheduled to be released in 6000 ms.
+2025-05-19 19:04:48.995 [info] Extension host with pid 254741 exiting with code 0

@@ -1,0 +1,12 @@
+{"timestamp":572766,"category":"newtab","name":"opened","extra":{"source":"about:newtab","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}"}}
+{"timestamp":629762,"category":"topsites","name":"impression","extra":{"is_sponsored":"false","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","position":"2"}}
+{"timestamp":629763,"category":"topsites","name":"impression","extra":{"is_sponsored":"false","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","position":"5"}}
+{"timestamp":629763,"category":"pocket","name":"impression","extra":{"tile_id":"2343089779872775","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","position":"2","is_sponsored":"false"}}
+{"timestamp":629763,"category":"pocket","name":"impression","extra":{"is_sponsored":"false","position":"0","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","tile_id":"8719161747387704"}}
+{"timestamp":629764,"category":"topsites","name":"impression","extra":{"position":"0","is_sponsored":"false","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}"}}
+{"timestamp":629764,"category":"topsites","name":"impression","extra":{"position":"1","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","is_sponsored":"false"}}
+{"timestamp":629764,"category":"topsites","name":"impression","extra":{"newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","is_sponsored":"false","position":"6"}}
+{"timestamp":629764,"category":"pocket","name":"impression","extra":{"position":"1","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","is_sponsored":"false","tile_id":"1671074653680199"}}
+{"timestamp":629765,"category":"topsites","name":"impression","extra":{"position":"7","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","is_sponsored":"false"}}
+{"timestamp":629765,"category":"topsites","name":"impression","extra":{"is_sponsored":"false","position":"4","newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}"}}
+{"timestamp":629765,"category":"topsites","name":"impression","extra":{"newtab_visit_id":"{0984e811-2c9e-4295-8a34-0531ed424c34}","is_sponsored":"false","position":"3"}}

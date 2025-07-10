@@ -1,0 +1,7 @@
+# This file is created by ibus-daemon, please do not modify it.
+# This file allows processes on the machine to find the
+# ibus session bus with the below address.
+# If the IBUS_ADDRESS environment variable is set, it will
+# be used rather than this file.
+IBUS_ADDRESS=unix:path=/home/atgin-srv-ask/.cache/ibus/dbus-yRSYP2K9,guid=5afd42c6bcf617b7ce0eec69686f5c5f
+IBUS_DAEMON_PID=2840

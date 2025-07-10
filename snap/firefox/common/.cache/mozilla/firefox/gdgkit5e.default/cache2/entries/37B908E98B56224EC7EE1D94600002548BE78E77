@@ -1,0 +1,551 @@
+var frontboard_types = [];
+frontboard_types[0] = "kit";
+frontboard_types[1] = "normal";
+frontboard_types[2] = "scrolling";
+frontboard_types[3] = "label";
+frontboard_types[4] = "FULL_KEYPAD_TFIE1";
+frontboard_types[5] = "6DAK_TFIE2";
+frontboard_types[6] = "3BTN_TFIE3";
+frontboard_types[7] = "ECPIRP";
+frontboard_types[8] = "1DAK_EAPII1";
+frontboard_types[9] = "6DAK_EAPII2";
+frontboard_types[10] = "ECPIR3P";
+frontboard_types[11] = "EAPIR8";
+frontboard_types[12] = "IP_SPEAKER";
+frontboard_types[13] = "scrolling";
+frontboard_types[51] = "video";
+frontboard_types[52] = "scrolling";
+frontboard_types[53] = "mini";
+frontboard_types[54] = "label";
+
+function on_station_mode(sigmode) {
+	hide('amc_config');
+	hide('exi_config');
+	hide('acc_fb_config');
+	hide('warn_server');
+	$('#global_pulse_server').val("0");
+
+	if (sigmode == "1") // sip
+	{
+		show('acc_fb_config');
+		$('#global_sigmode').val("sip");
+	}
+	else if (sigmode == "2") // alphacom
+	{
+		show('acc_fb_config');
+		show('amc_config');
+		$('#global_sigmode').val("dip");
+	}
+	else if (sigmode == "3") // pulse
+	{
+		show('acc_fb_config');
+		$('#global_sigmode').val("pulse");
+	}
+	else if (sigmode == "4") // pulse server
+	{
+		show('acc_fb_config');
+		show('warn_server');
+		$('#global_pulse_server').val("1");
+		$('#global_sigmode').val("pulse");
+	}
+	else if (sigmode == "5") // exigo
+	{
+		show('exi_config');
+		$('#global_sigmode').val("exigo");
+	}
+}
+
+// This one is called when presing submenus
+var interval;
+function iframeLoaded(frameid) {
+	iframeresizer(frameid);
+
+	//safeties so we ensure some page loads even if iframe did not explicitly update using iframeresize
+	clearInterval(interval);
+	interval = setInterval(function () { iframeresizer(frameid); }, 5000);
+}
+
+function iframeresizer(frameid) {
+	var iFrameID = document.getElementById(frameid);
+	if (iFrameID) {
+		// here you can make the height, I delete it first, then I make it again
+		var subcontent = document.getElementsByClassName("subcontent");
+		for (var i = 0; i < subcontent.length; i++) {
+			subcontent[i].style.height = iFrameID.contentWindow.document.body.scrollHeight + "px";
+		}
+	}
+}
+
+// This one is called by iframes
+function iframeResize(timer = 50) {
+	setTimeout(function () {
+		var iFrameID = parent.document.getElementById(window.frameElement.id);
+		if (iFrameID) {
+			// here you can make the height, I delete it first, then I make it again
+			var subcontent = parent.document.getElementsByClassName("subcontent");
+			for (var i = 0; i < subcontent.length; i++) {
+				subcontent[i].style.height = iFrameID.contentWindow.document.body.scrollHeight + "px";
+			}
+		}
+	}, timer);
+
+}
+
+
+
+function validate_admin_form() {
+	var mask = document.getElementById("net00").value + "." +
+		document.getElementById("net10").value + "." +
+		document.getElementById("net20").value + "." +
+		document.getElementById("net30").value;
+	var cdir = netmask2CIDR(mask);
+	var testmask = -1;
+	if (cdir != -1)
+		testmask = CDIR2netmask(cdir);
+	if (mask != testmask) {
+		alert("Subnet mask " + mask + " is invalid");
+		return false;
+	}
+}
+
+function netmask2CIDR(netmask) {
+	switch (netmask) {
+		case "0.0.0.0":
+			return 0;
+		case "128.0.0.0":
+			return 1;
+		case "192.0.0.0":
+			return 2;
+		case "224.0.0.0":
+			return 3;
+		case "240.0.0.0":
+			return 4;
+		case "248.0.0.0":
+			return 5;
+		case "252.0.0.0":
+			return 6;
+		case "254.0.0.0":
+			return 7;
+		case "255.0.0.0":
+			return 8;
+		case "255.128.0.0":
+			return 9;
+		case "255.192.0.0":
+			return 10;
+		case "255.224.0.0":
+			return 11;
+		case "255.240.0.0":
+			return 12;
+		case "255.248.0.0":
+			return 13;
+		case "255.252.0.0":
+			return 14;
+		case "255.254.0.0":
+			return 15;
+		case "255.255.0.0":
+			return 16;
+		case "255.255.128.0":
+			return 17;
+		case "255.255.192.0":
+			return 18;
+		case "255.255.224.0":
+			return 19;
+		case "255.255.240.0":
+			return 20;
+		case "255.255.248.0":
+			return 21;
+		case "255.255.252.0":
+			return 22;
+		case "255.255.254.0":
+			return 23;
+		case "255.255.255.0":
+			return 24;
+		case "255.255.255.128":
+			return 25;
+		case "255.255.255.192":
+			return 26;
+		case "255.255.255.224":
+			return 27;
+		case "255.255.255.240":
+			return 28;
+		case "255.255.255.248":
+			return 29;
+		case "255.255.255.252":
+			return 30;
+		case "255.255.255.254":
+			return 31;
+		case "255.255.255.255":
+			return 32
+	}
+	return -1;
+}
+
+function vsIsExigoMode() {
+	if ($('#global_sigmode').val() == 'exigo')
+		return true;
+	return false;
+}
+
+function vsGetSigMode() {
+	return ($('#global_sigmode').val());
+}
+
+function vsGetHwType() {
+	return $('#global_hwtype').val();
+}
+
+function CDIR2netmask(bitCount) {
+	var mask = [];
+	for (var i = 0; i < 4; i++) {
+		var n = Math.min(bitCount, 8);
+		mask.push(256 - Math.pow(2, 8 - n));
+		bitCount -= n;
+	}
+	return mask.join('.');
+}
+
+function show(html_element) {
+	var myElement = document.getElementById(html_element);
+	if (myElement != null)
+		myElement.style.display = 'block';
+}
+function hide(html_element) {
+	var myElement = document.getElementById(html_element);
+	if (myElement != null)
+		myElement.style.display = 'none';
+}
+function toggle(html_element) {
+	var myElement = document.getElementById(html_element); if (myElement.style.display == 'none')
+		myElement.style.display = 'block';
+	else
+		myElement.style.display = 'none';
+}
+function toggleClassRows(class_element) {
+	var elements_to_toggle = document.getElementsByClassName(class_element);
+	for (var i = 0; i < elements_to_toggle.length; i++) {
+		if (elements_to_toggle[i].style.visibility == 'visible')
+			elements_to_toggle[i].style.visibility = 'collapse';
+		else
+			elements_to_toggle[i].style.visibility = 'visible';
+	}
+}
+
+function showhideCustom2(html_element2, html_element) {
+	var myElement = document.getElementById(html_element);
+	var myElement2 = document.getElementById(html_element2);
+
+	if (myElement2.value == '100') {
+		myElement.style.display = '';
+	}
+	else {
+		myElement.style.display = 'none';
+	}
+}
+function showhideCustom3(html_element2, html_element) {
+	var myElement = document.getElementById(html_element);
+	var myElement2 = document.getElementById(html_element2);
+
+	if (myElement2.value == 'manual') {
+		myElement.style.display = '';
+	}
+	else {
+		myElement.style.display = 'none';
+	}
+}
+function showHide(html_element) {
+	var myElement = document.getElementById(html_element); if (myElement.style.visibility == 'hidden')
+		myElement.style.visibility = 'unhidden';
+	else
+		myElement.style.visibility = 'hidden';
+}
+function unhide(divID) {
+	var item = document.getElementById(divID);
+	if (item) {
+		item.className = (item.className == 'hidden') ? 'unhidden' : 'hidden';
+	}
+}
+function showMenu(mode, frontboard, advanced) {
+
+
+	hide('idsipconf');
+	hide('idadv');
+	hide('idadvnet');
+	hide('idsipadv');
+	hide('idsipadvnet');
+	hide('idadv_oled');
+	hide('idadv_scrolling');
+	hide('idserver');
+	hide('idadv_vid_scrolling');
+	hide('idadv_vid_oled');
+	hide('idadv_vid');
+	hide('idadmconf');
+	hide('edge_help');
+	hide('idsipconfedge');
+
+	var dip_mode = 0;
+	$('#global_pulse_server').val("0");
+
+	if (mode == 'sip') {
+		show('idsipconf');
+		show('idadmconf');
+		if (advanced == 1) {
+			show('idsipadv');
+			show('idsipadvnet');
+		}
+		$('#global_sigmode').val("sip");
+	}
+	else if (mode == 'dip' || mode == 'exi') {
+		dip_mode = '1';
+		if (mode != 'exi')
+			show('idadvnet');
+		show('idadmconf');
+		if (mode == 'dip')
+			$('#global_sigmode').val("dip");
+		else
+			$('#global_sigmode').val("exigo");
+	}
+	else if (mode == 'sipwithserver') {
+		show('idsipconf');
+		show('idsipadv');
+		show('idsipadvnet');
+		show('idserver');
+	}
+	if (mode == 'exc') {
+		console.log("mode exc " + mode + "advanced " + advanced);
+
+		show('idsipconfedge');
+		show('idadmconf');
+		if (advanced == 1)
+			show('idsipadvnet');
+		show('edge_help');
+		$('#global_sigmode').val("pulse");
+	}
+	else if (mode == 'srv') {
+		console.log("mode srv " + mode + "advanced " + advanced);
+
+		if (advanced == 1) {
+			console.log("advanced one");
+			show('idsipconfedge');
+			show('idadmconf');
+			show('idsipadvnet');
+		}
+		show('idserver');
+		$('#global_sigmode').val("pulse");
+		$('#global_pulse_server').val("1");
+		show('edge_help');
+	}
+	$('#global_frontboard_index').val(frontboard); // set new value to dom
+	$('#global_frontboard').val("");
+	$('#global_video').val("");
+	var tmpFrontboard = parseInt(frontboard);
+	if ((tmpFrontboard < 0) || (tmpFrontboard > 59) || ((tmpFrontboard > 13) && (tmpFrontboard < 51))) {
+	}
+	else {
+		$('#global_frontboard').val(frontboard_types[tmpFrontboard]);
+		if ((tmpFrontboard == 51) || (tmpFrontboard == 52) || (tmpFrontboard == 54) || (tmpFrontboard == 56) || (tmpFrontboard == 57) || (tmpFrontboard == 58) || (tmpFrontboard == 59)) {
+			$('#global_video').val("video");
+		}
+	}
+
+
+
+
+	if (dip_mode != 1) {
+
+	}
+	else if (mode != 'exi') {
+		if (frontboard == '2') {
+			show('idadv_scrolling');
+		}
+		else if (frontboard == '3') {
+			show('idadv_oled');
+		}
+		else if (frontboard == '51') {
+			show('idadv_vid');
+		}
+		else if (frontboard == '52') {
+			show('idadv_vid_scrolling');
+		}
+		else if (frontboard == '54') {
+			show('idadv_vid_oled');
+		}
+		else {
+			show('idadv');
+		}
+	}
+}
+function showKeyboard(){
+	//if keyboard is needed to be seen it will return true
+	//check for TKIE or 8511 boards
+	if( ($('#global_hwtype').val() == '8124') || ($('#global_hwtype').val() == '8169') ||  ($('#global_hwtype').val() == '8511') || ($('#global_hwtype').val() == '8512'))
+		return true;
+	//check for inca
+	if( ($('#global_hwtype').val() <= '5000') )
+		return true;
+	//check for inca_refresh
+	if( ($('#global_hwtype').val() >= '8820') && ($('#global_hwtype').val() < '8830'))
+		{
+			if($('#global_hwtype').val() >= '8824')
+				return false
+			return true;
+		}
+	//other cases
+	return false;
+}
+function toggleTbody(id) {
+	if (document.getElementById) {
+		var tbod = document.getElementById(id);
+		if (tbod && typeof tbod.className == 'string') {
+			if (tbod.className == 'off') {
+				tbod.className = 'on';
+			} else {
+				tbod.className = 'off';
+			}
+		}
+	}
+	return false;
+}
+function vsIsAmplifier() {
+	if ($('#global_hwtype').val() == '8335' ||
+		$('#global_hwtype').val() == '8330' ||
+		$('#global_hwtype').val() == '8674' ||
+		$('#global_hwtype').val() == '8630')
+		return true;
+
+	return false;
+}
+function writeText(txt, id) {
+	document.getElementById(id).innerHTML = txt;
+}
+function writeValueText(txt, id) {
+	document.getElementById(id).value = txt;
+}
+function displayRow(id) {
+	var row = document.getElementById(id); row.style.display = ''
+}
+function hideRow(id) {
+	var row = document.getElementById(id); row.style.display = 'none'
+}
+function changeRow(id_row, id_checkbox) {
+	var checkbox = document.getElementById(id_checkbox);
+	var row = document.getElementById(id_row);
+	if (checkbox.checked == true) {
+		row.style.display = '';
+	}
+	else {
+		row.style.display = 'none';
+	}
+}
+function oppositeEnable(id_checkbox) {
+	var checkbox = document.getElementById(id_checkbox);
+	if (checkbox.disabled == true) {
+		checkbox.disabled = '';
+	}
+	else {
+		checkbox.disabled = true;
+	}
+}
+function check(id) {
+	var variable = document.getElementById(id);
+	variable.checked = true;
+}
+function uncheck(id) {
+	var variable = document.getElementById(id);
+	variable.checked = '';
+}
+function checkopposite(id) {
+	var mainbox = document.getElementById(id);
+	if (mainbox.checked == true) {
+		mainbox.value = 'on';
+	}
+	else {
+		mainbox.value = 'off';
+	}
+}
+function checkmany(id_mainbox, id_subbox, id_number) {
+	var mainbox = document.getElementById(id_mainbox);
+	var number_element = document.getElementById(id_number);
+	for (i = 0; i < number_element.value; i++) {
+		var subbox = document.getElementById(id_subbox + i);
+		if (subbox && mainbox.checked == true) {
+			subbox.checked = true;
+		}
+		else if (subbox)
+			subbox.checked = '';
+	}
+}
+function changemany(id_mainbox, id_subbox, id_number) {
+	var mainbox = document.getElementById(id_mainbox);
+	var number_element = document.getElementById(id_number);
+	for (i = 0; i < number_element.value; i++) {
+		var subbox = document.getElementById(id_subbox + i);
+		subbox.value = mainbox.value
+	}
+}
+
+function vsConvertEpochToDate(epochSeconds) {
+	if (!epochSeconds)
+		return "";
+	var date = new Date(epochSeconds * 1000);
+	return (("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/'
+		+ date.getFullYear() + ' ' + ("0" + date.getHours()).slice(-2) + ':'
+		+ ("0" + date.getMinutes()).slice(-2) + ':' + ("0" + date.getSeconds()).slice(-2));
+}
+
+function isIncaRefresh(hw_type)
+{
+	var hwtype = hw_type;
+	if(hwtype >= 8820 && hwtype < 8830)
+		return 1;
+	return 0;
+}
+
+function isTurbineCompactPlus(hw_type)
+{
+	var hwtype = hw_type;
+	if(hwtype == 8801)
+		return 1;
+	return 0;
+}
+
+function isOldInca(hwtype)
+{
+	var incaStation = 0;
+	if(hwtype >= 8020 && hwtype < 8030)
+		incaStation = 1;
+	if(hwtype == 0)
+		incaStation = 1;
+	return incaStation;
+}
+
+function hideLicenses(hw_type)
+{
+	if(isTurbineCompactPlus(hw_type)||isIncaRefresh(hw_type))
+		return 0;
+	return 1;
+}
+
+function check_volume_override_level(e)
+{
+	var check_volovr_level = document.getElementById("volovr_level").value;
+	var check_speaker_volume = document.getElementById("speaker_volume").value;
+	if (check_volovr_level < check_speaker_volume) {
+		e.preventDefault();
+		alert("Volume override level must be higher than speaker volume!");
+		return 0;
+	}
+	return 1;
+}
+væ%_8           gë¾HO&gë¾   V    O^partitionKey=%28http%2C10.50.93.17%29,:http://10.50.93.17/zenitel.js?version=7.2.3.0 strongly-framed 1 request-method GET auth Basic response-head HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 09 Jan 2025 08:34:13 GMT
+Content-Type: application/x-javascript
+Content-Length: 13269
+Last-modified: Fri Mar  9 13:34:56 2018
+ original-response-headers Server: nginx
+Date: Thu, 09 Jan 2025 08:34:13 GMT
+Content-Type: application/x-javascript
+Content-Length: 13269
+Connection: keep-alive
+Last-modified: Fri Mar  9 13:34:56 2018
+ ctid 2 uncompressed-len 0   3Õ

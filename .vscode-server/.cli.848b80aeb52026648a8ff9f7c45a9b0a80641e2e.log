@@ -1,0 +1,5 @@
+Listening on 127.0.0.1:38197
+[2025-05-20 15:27:43] info Disposed of connection to running server.
+[2025-05-20 15:27:43] info Checking /home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/log.txt and /home/atgin-srv-ask/.vscode-server/cli/servers/Stable-848b80aeb52026648a8ff9f7c45a9b0a80641e2e/pid.txt for a running server...
+[2025-05-20 15:27:43] info Found running server (pid=842244)
+[2025-05-20 15:30:51] info Disposed of connection to running server.

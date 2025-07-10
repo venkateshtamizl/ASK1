@@ -1,0 +1,15 @@
+{
+    "remote.SSH.remotePlatform": {
+        "10.30.250.245": "linux",
+        "192.168.121.130": "linux",
+        "192.168.121.128": "linux",
+        "10.30.10.23": "linux",
+        "192.168.121.134": "linux",
+        "192.168.121.136": "linux",
+        "192.168.121.133": "linux",
+        "10.30.250.50": "linux"
+    },
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "vs-minimal"
+}

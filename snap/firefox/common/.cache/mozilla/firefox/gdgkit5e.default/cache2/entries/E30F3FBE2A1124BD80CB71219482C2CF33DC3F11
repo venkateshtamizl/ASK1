@@ -1,0 +1,450 @@
+angularapp.service('vs_helper', function($http)
+{
+	var vsState = {};
+	vsState.config = {};
+	var self = this;
+
+	this.getZapStateEndpoint = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ get: 'get', path: '/state/endpoint' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data && response.data.out && response.data.out.get && response.data.out.get.data)
+					vsState.endpoint = response.data.out.get.data.endpoint;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.getZapStatePowerSources = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ get: 'get', path: '/state/power_sources' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data && response.data.out && response.data.out.get && response.data.out.get.data)
+					vsState.power_sources = response.data.out.get.data.power_sources;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.getZapConfigSignallingMode = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ get: 'get', path: '/state/config/mode' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data && response.data.out && response.data.out.get && response.data.out.get.data)
+					vsState.config.mode = response.data.out.get.data.mode;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.getDeviceUtilities = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ getDeviceUtilities: '' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data)
+					vsState.config.isIPv6Ready = response.data.isIPv6Ready;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.getSignallingMode = function()
+	{
+		if (vsState.config.mode)
+			return vsState.config.mode;
+		else if (parent.vsGetSigMode())
+			return parent.vsGetSigMode();
+		else
+			return "unknown";
+	}
+
+	this.getDevicePowerSource = function()
+	{
+		if (vsState.endpoint && vsState.endpoint.hardware_type && vsState.power_sources)
+		{
+			if (vsState.endpoint.hardware_type == 8330)
+			{
+				if (vsState.power_sources.power_type == "unknown" || vsState.power_sources.power_type == "400w_psu") // ENA 2200
+					return "ACDC";
+				else if (vsState.power_sources.power_type == "1250w_dc") //ENA 2400 DC
+					return "DC";
+				else if (vsState.power_sources.power_type == "1250w_ac") //ENA 2400 AC
+					return "AC";
+				else
+					return "unknown";
+			}
+			else if (vsState.endpoint.hardware_type == 8335) //ENA RS only DC
+				return "DC";
+			else if (vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674) //ENA 2100 AC
+				return "AC";
+		}
+		return "unknown"
+	}
+
+	this.getHWtype = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+			return vsState.endpoint.hardware_type;
+		return 0;
+	}
+
+	this.deviceHasAdvancedLineMonitoringOptions = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasSWRouting = function() //routing done in SW
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if(vsState.endpoint.hardware_type == 8330)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasAnalogueHwRouting = function() //routing done using relay
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if(vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasChannelEnableDisable = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if(vsState.endpoint.hardware_type != 8630 && vsState.endpoint.hardware_type != 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.getHWRev = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_rev)
+			return vsState.endpoint.hardware_rev;
+		return "unknown";
+	}
+
+	this.getDeviceModel = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.device_model)
+			return vsState.endpoint.device_model;
+		return "unknown";
+	}
+
+	this.deviceHasCoolingFan = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true
+		}
+		return false;
+	}
+
+	this.deviceHasLineVoltageSelection = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasLetMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasPaUi = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8320)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasMicMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674) //add 8124, 8169 and 8511 when added to web
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasPhantomPowerMic = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasRcioMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasRcio = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8121 || vsState.endpoint.hardware_type == 8124 || vsState.endpoint.hardware_type == 8169 || vsState.endpoint.hardware_type == 8674) //add 8335 when enabled
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasFuseMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasLineInMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasHeadphoneMonitoring = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasOneChanMode = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceHasEthSwitch = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8335 || vsState.endpoint.hardware_type == 8169
+			|| vsState.endpoint.hardware_type == 8124 || vsState.endpoint.hardware_type == 8511 || vsState.endpoint.hardware_type == 8169 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsAmplifier = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			if (vsState.endpoint.hardware_type == 8330 || vsState.endpoint.hardware_type == 8630 || vsState.endpoint.hardware_type == 8335 || vsState.endpoint.hardware_type == 8674)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsVideo = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type && vsState.endpoint.device_model)
+		{
+			if (vsState.endpoint.device_model == "Stentofon Turbine Compact - Video" || vsState.endpoint.device_model == "Zenitel TCIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV FULLKEY i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TMIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV RFID i.MX8MM board")
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsOldVideo = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type && vsState.endpoint.device_model)
+		{
+			if (vsState.endpoint.hardware_type == 8121 && vsState.endpoint.device_model == "Stentofon Turbine Compact - Video")
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsTCIVplus = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type && vsState.endpoint.device_model)
+		{
+			if (vsState.endpoint.device_model == "Zenitel TCIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV FULLKEY i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TMIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV RFID i.MX8MM board")
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsTCIVplusVideo = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type && vsState.endpoint.device_model && vsState.config.frontboardType)
+		{
+			if (vsState.endpoint.device_model == "Zenitel TCIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV FULLKEY i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TMIV i.MX8MM board" || vsState.endpoint.device_model == "Zenitel TEIV RFID i.MX8MM board")
+			{
+				if(vsState.config.frontboardType == 0 || vsState.config.frontboardType == 51 || vsState.config.frontboardType == 51 || vsState.config.frontboardType == 52
+					|| vsState.config.frontboardType == 54 || vsState.config.frontboardType == 56 || vsState.config.frontboardType == 57 || vsState.config.frontboardType == 58 || vsState.config.frontboardType == 59) 
+					return true;
+			}
+		}
+		return false;
+	}
+
+	this.deviceIsIncaRefresh = function()
+	{
+		if(vsState.endpoint && vsState.endpoint.hardware_type && vsState.endpoint.device_model)
+		{
+			if (vsState.endpoint.hardware_type >= 8820 && vsState.endpoint.hardware_type < 8830)
+				return true;
+		}
+		return false;
+	}
+
+	this.deviceIsIpv6Ready = function()
+	{
+		if (vsState.config.isIPv6Ready)
+			return vsState.config.isIPv6Ready;
+		return false;
+	}
+
+	this.getFrontboardType = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ getFrontboard: '' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data)
+					vsState.config.frontboardType = response.data.frontboardType;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.getAdvancedMode = function()
+	{
+		return $http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({ getAdvancedMode: '' }),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if(response.data)
+					vsState.config.advanced_mode = response.data.advancedMode;
+			}, function errorCallback(response) {
+				console.log(response);
+			});
+	}
+
+	this.isAdvancedMode = function()
+	{
+		if (vsState.config.advanced_mode === 1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	this.deviceHardwareType = function()
+	{
+		if (vsState.endpoint && vsState.endpoint.hardware_type)
+		{
+			return vsState.endpoint.hardware_type;
+		}
+	}
+
+	this.deviceFrontboardType = function()
+	{
+		return vsState.config.frontboardType;
+	}
+
+	this.load = function()
+	{
+		return this.getZapStateEndpoint()
+			.then(function() {
+				return self.getZapStatePowerSources();
+			})
+			.then(function() {
+				return self.getZapConfigSignallingMode();
+			})
+			.then(function() {
+				return self.getDeviceUtilities();
+			})
+			.then(function() {
+				return self.getFrontboardType();
+			})
+			.then(function() {
+				return self.getAdvancedMode();
+			});
+	}
+});
+(õœX¶í           gë½{HN·gë½{   X    O^partitionKey=%28http%2C10.50.93.17%29,:http://10.50.93.17/vs_helper.js?version=7.2.3.0 strongly-framed 1 request-method GET auth Basic response-head HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 09 Jan 2025 08:31:33 GMT
+Content-Type: application/x-javascript
+Content-Length: 12869
+Last-modified: Fri Mar  9 13:34:56 2018
+ original-response-headers Server: nginx
+Date: Thu, 09 Jan 2025 08:31:33 GMT
+Content-Type: application/x-javascript
+Content-Length: 12869
+Connection: keep-alive
+Last-modified: Fri Mar  9 13:34:56 2018
+ ctid 2 uncompressed-len 0   2E

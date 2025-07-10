@@ -1,0 +1,16 @@
+version: '3'
+services:
+  asterisk:
+    build: .
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "8088:8088"
+      - "10000-20000:10000-20000/udp"
+    volumes:
+      - /home/atgin-srv-ask/code/configs:/etc/asterisk      # configs
+      - /home/atgin-srv-ask/code/var-lib-asterisk:/var/lib/asterisk  # persistent data
+      - /home/atgin-srv-ask/code/var-spool-asterisk:/var/spool/asterisk  # voicemail, recordings
+      - /home/atgin-srv-ask/code/var-log-asterisk:/var/log/asterisk  # logs
+
+    restart: unless-stopped

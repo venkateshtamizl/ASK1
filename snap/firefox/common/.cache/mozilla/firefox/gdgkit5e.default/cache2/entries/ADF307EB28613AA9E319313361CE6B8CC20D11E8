@@ -1,0 +1,512 @@
+angularapp = angular.module('vs', []);
+
+angularapp.controller('endpointcontrol', function($scope, $http, $timeout) {
+	$scope.init = true;
+	$scope.hasSaved = false;
+	$scope.dynamicConfig = 0;
+	$scope.inputs = {};
+	$scope.audio = {};
+
+	$scope.serverEdited = function(server, priority)
+	{
+		server.priority = priority;
+	}
+
+	$scope.getAccountServer = function(registration, priority)
+	{
+		for(var i = 0; i < registration.servers.length; i++)
+		{
+			if(priority == registration.servers[i].priority)
+			{
+				return registration.servers[i];
+			}
+		}
+
+		return null;
+	}
+
+	$scope.updateMenu = function()
+	{
+		if($scope.config.mode == 'exigo')
+			parent.showMenu('exi', '0');
+		if($scope.config.mode == 'sip')
+			parent.showMenu('sip', '0');
+		if($scope.config.mode == 'alphacom')
+			parent.showMenu('dip', '0');
+		if($scope.config.mode == 'pulse')
+			parent.showMenu('exc', '0');
+	}
+
+	$scope.isAmplifier = function()
+	{
+		if($scope.state && $scope.state.endpoint)
+			if($scope.state.endpoint.hardware_type == 8335 ||
+				$scope.state.endpoint.hardware_type == 8330 ||
+				$scope.state.endpoint.hardware_type == 8630 ||
+				$scope.state.endpoint.hardware_type == 8674)
+			{
+				return true;
+			}
+		return false;
+	}
+
+	$scope.isIntercom = function()
+	{
+		if($scope.isAmplifier() == true)
+			return false;
+		return true;
+	}
+
+	$scope.netUpdate = function()
+	{
+		$scope.iface.ipv4_cidr = $scope.netutil.getIpv4Cidr($scope.tmpiface.ipaddress, $scope.tmpiface.subnet);
+		if($scope.iface.ipv4_cidr.length < 5)
+			$scope.iface.ipv4_cidr = "169.254.1.100/24";
+
+		$scope.config.os_ip.dns.server = [];
+		if($scope.tmpdns.dns1 != '0.0.0.0' && $scope.tmpdns.dns1.length > 5)
+		{
+			$scope.config.os_ip.dns.server.push($scope.tmpdns.dns1);
+		}
+		if($scope.tmpdns.dns2 != '0.0.0.0' && $scope.tmpdns.dns2 != $scope.tmpdns.dns1  && $scope.tmpdns.dns2.length > 5)
+		{
+			$scope.config.os_ip.dns.server.push($scope.tmpdns.dns2);
+		}
+	}
+
+	$scope.createNet = function(data)
+	{
+		for(var i = 0; i < data.config.os_ip.interfaces.iface.length; i++)
+		{
+			if(data.config.os_ip.interfaces.iface[i].name == 'eth0')
+			{
+				$scope.iface = data.config.os_ip.interfaces.iface[i];
+			}
+		}
+		for(var i = 0; i < data.config.os_ip.routes.route_ipv4.length; i++)
+		{
+			if(data.config.os_ip.routes.route_ipv4[i].iface == 'eth0')
+			{
+				$scope.route = data.config.os_ip.routes.route_ipv4[i];
+			}
+		}
+
+		if($scope.iface.use_dhcp == null)
+			$scope.iface.use_dhcp = true;
+
+		if($scope.iface.ipv4_cidr == null)
+			$scope.iface.ipv4_cidr = "169.254.1.100/24";
+		if($scope.route.destination == null)
+			$scope.route.destination = "0.0.0.0/0";
+		if($scope.route.gateway == null)
+			$scope.route.gateway = "169.254.1.1";
+
+
+		$scope.tmpiface = {};
+		$scope.tmpiface.ipaddress = $scope.netutil.getIpAddress($scope.iface.ipv4_cidr);
+		$scope.tmpiface.subnet = $scope.netutil.getNetMask($scope.iface.ipv4_cidr);
+
+		$scope.tmpdns = {};
+		if(data.config.os_ip.dns.server == null)
+		{
+			data.config.os_ip.dns.server = [];
+		}
+		if(data.config.os_ip.dns.server.length > 0)
+			$scope.tmpdns.dns1 = data.config.os_ip.dns.server[0]
+		if(data.config.os_ip.dns.server.length > 1)
+			$scope.tmpdns.dns2 = data.config.os_ip.dns.server[1];
+
+		if(data.config.os_ip.ntp.server == null)
+		{
+			data.config.os_ip.ntp.server = [];
+		}
+		if(data.config.os_ip.ntp.server.length < 1)
+		{
+			var srv = {}
+			srv.hostname = "0.0.0.0";
+			data.config.os_ip.ntp.server.push(srv);
+		}
+	}
+
+	$scope.createAccounts = function(data)
+	{
+		$scope.accounts = [];
+		if($scope.isAmplifier())
+		{
+			if(data.config.lines && data.config.lines.line)
+			{
+				for(var i = 0; i < data.config.lines.line.length; i++)
+				{
+
+					var lineconf = data.config.lines.line[i];
+					var account = {}
+					if(lineconf.kid == "ch1")
+						account.name = "Channel 1";
+					if(lineconf.kid == "ch2")
+						account.name = "Channel 2";
+					if(lineconf.kid == "ln1")
+					{
+						account.name = "Input Channel"
+					}
+					if(lineconf.kid == "ln2")
+					{
+						continue; // Not in use anymore
+					}
+
+					account.conf = lineconf;
+					account.primaryserv = $scope.getAccountServer(account.conf.registration, "primary");
+					account.secondaryserv = $scope.getAccountServer(account.conf.registration, "secondary");
+					account.tertiaryserv = $scope.getAccountServer(account.conf.registration, "tertiary");
+
+					$scope.accounts.push(account);
+				}
+			}
+
+		}
+		else
+		{
+			var account = {}
+			account.name = "Main";
+			account.conf = data.config;
+			account.primaryserv = $scope.getAccountServer(account.conf.registration, "primary");
+			account.secondaryserv = $scope.getAccountServer(account.conf.registration, "secondary");
+			account.tertiaryserv = $scope.getAccountServer(account.conf.registration, "tertiary");
+
+			$scope.accounts.push(account);
+		}
+	}
+
+	$scope.onDataLoaded = function(data)
+	{
+		if(data.config.mode == null)
+			data.config.mode = "pulse";
+		$scope.createAccounts(data);
+		$scope.createNet(data);
+		$scope.currendp = data.config;
+	}
+
+	$scope.postData = function(data)
+	{
+		// console.log(angular.toJson(data));
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param(data),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		})
+	}
+
+	$scope.addCertificateFile = function() {
+		// console.log("addFile");
+		var fd = new FormData();
+		fd.append('filename', document.getElementById('filename').files[0]);
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "/goform/zForm_upload_cert");
+		request.send(fd);
+
+		$scope.refreshCertList();
+	}
+
+	$scope.goBack = function()
+	{
+		$scope.hasSaved = false;
+	}
+
+	$scope.saveData = function()
+	{
+		console.log('save data');
+		console.log($scope.config.lines);
+
+		var stringentries = angular.toJson({read_ip: $scope.ng_read_ip,factory_reset_disable: $scope.ng_factory_reset_disable});
+
+		$scope.isLoading = true;
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ edit: 'edit', path: '/config', op:'put', data: angular.toJson($scope.devicedata)}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			$http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({mainsettings: stringentries}),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				if($scope.state.endpoint.hardware_type == "8674" || $scope.state.endpoint.hardware_type == "8630")
+				{
+					$scope.isLoading = false;
+					$scope.hasSaved = true;
+				}
+				console.log(response.data);
+			}, function errorCallback(response) {
+			});
+			console.log(response.data);
+		}, function errorCallback(response) {
+		});
+		if($scope.state.endpoint.hardware_type != "8674" && $scope.state.endpoint.hardware_type != "8630")
+		{
+			if ($scope.inputs.device_input == 'internal_mic')
+			{
+				$scope.audio.io.input_devices.input_device[0].input_type = "electret_mic";
+				$scope.audio.io.input_devices.input_device[1].input_type = "not_connected";
+			}
+			else
+			{
+				$scope.audio.io.input_devices.input_device[0].input_type = "not_connected";
+				$scope.audio.io.input_devices.input_device[1].input_type = "line_in_professional";
+			}
+			var stringentries_audio = angular.toJson({audio: $scope.audio});
+			$http({
+				method: 'POST',
+				url: '/goform/zForm_auto_config',
+				data: jQuery.param({audio: stringentries_audio}),
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).then(function successCallback(response) {
+				$scope.refreshData();
+				$scope.isLoading = false;
+				$scope.hasSaved = true;
+			}, function errorCallback(response) {
+			});
+		}
+	}
+
+	$scope.reboot = function()
+	{
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ restart: '' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+	}
+
+	$scope.getStateEndpoint = function()
+	{
+
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ get: 'get', path: '/state/endpoint' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+
+
+			if(response.data && response.data.out && response.data.out.get && response.data.out.get.data)
+			{
+				$scope.state.endpoint = response.data.out.get.data.endpoint;
+				console.log($scope.state.endpoint);
+			}
+			$scope.refreshData();
+
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+	}
+
+	$scope.getNtpRegions = function()
+	{
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ ntpregions: 'ntpregions' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			$scope.ntp_regions = response.data.ntp_regions;
+
+			console.log(response);
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+	}
+
+	$scope.refreshCertList = function()
+	{
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ getSipCerts: 'getSipCerts' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			$scope.certs = response.data.certs;
+		});
+	}
+
+	$scope.isPrivateKey = function(cert)
+	{
+		console.log(cert);
+		var val = cert.name;
+
+		if(val.endsWith(".key"))
+			return true;
+		return false;
+	}
+
+	$scope.deleteCertificateFile = function(cert)
+	{
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_upload_cert',
+			data: jQuery.param({ fileToDelete: cert.name }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+
+
+		$scope.refreshCertList();
+	}
+
+	$scope.refreshData = function()
+	{
+		$scope.isLoading = true;
+
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ get: 'get', path: '/state/config' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			$scope.init = false;
+			$scope.isLoading = false;
+			$scope.devicedata = angular.fromJson(angular.toJson(response.data.out.get.data));
+			$scope.config = $scope.devicedata.config;
+			if ($scope.devicedata.ntp_regions != null)
+				$scope.ntp_regions = $scope.devicedata.ntp_regions;
+
+			$scope.onDataLoaded($scope.devicedata);
+			console.log(response);
+
+			$scope.refreshCertList();
+
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({getDynamicConfig: 'get'}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response){
+			$scope.dynamicConfig = angular.copy(response.data.value);
+			if (response.data.factory_reset_disable == "1")
+				$scope.ng_factory_reset_disable = true;
+			else
+				$scope.ng_factory_reset_disable = false;
+			if (response.data.read_ip == "1")
+				$scope.ng_read_ip = true;
+			else
+				$scope.ng_read_ip = false;
+
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({get: 'get', path: '/state/config/audio'}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response){
+			$scope.audio = angular.copy(response.data.out.get.data.audio);
+			if($scope.audio.io.input_devices.input_device[0].kid=='internal_mic' && $scope.audio.io.input_devices.input_device[0].input_type == 'electret_mic')
+			{
+				$scope.inputs.device_input = 'internal_mic';
+			}
+			else
+			{
+				$scope.inputs.device_input = 'line_in';
+			}
+			}, function errorCallback(response) {
+			console.log(response);
+		});
+	}
+
+	$scope.state = {};
+	$scope.getStateEndpoint();
+
+
+
+	var netutil = {};
+	netutil.getIpv4Cidr = function(ipaddress, netmask)
+	{
+		var n = netmask.split(".");
+		if(n.length == 4)
+		{
+			var cidr = 0;
+			for(var i = 0; i < 4; i++)
+			{
+				for(var a = 0; a < 8; a++)
+				{
+					if(n[i] & (1 << (7-a)))
+					{
+						cidr++;
+					}
+					else
+						break;
+				}
+			}
+			return ipaddress + '/' + cidr;
+		}
+	}
+
+	netutil.getIpAddress = function(ipv4_cidr) {
+		var n = ipv4_cidr.split("/");
+		if(n.length == 2)
+		{
+			return n[0];
+		}
+		return null;
+	}
+
+	netutil.getNetMask = function(ipv4_cidr) {
+		var n = ipv4_cidr.split("/");
+		if(n.length == 2)
+		{
+			var num = 0;
+			var count = 0;
+			var cidr = n[1];
+			var maskArray = new Array();
+			maskArray[0] = maskArray[1] = maskArray[2] = maskArray[3] = 0;
+			while(cidr > 0)
+			{
+				var i;
+				var calc = 0;
+				for(i = 0; i < 8; i++)
+				{
+					calc = calc | 1 << (7-i);
+					cidr--;
+					maskArray[count] = calc;
+					if(cidr <= 0)
+					{
+						break;
+					}
+				}
+				count++;
+			}
+			return maskArray[0] + '.' + maskArray[1] + '.' + maskArray[2] + '.' + maskArray[3];
+		}
+		return null;
+	};
+
+	$scope.netutil = netutil;
+
+});
+[Df nË           gë¾HO&gë¾   ^    O^partitionKey=%28http%2C10.50.93.17%29,:http://10.50.93.17/endpointcontrol.js?version=7.2.3.0 strongly-framed 1 request-method GET auth Basic response-head HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 09 Jan 2025 08:34:13 GMT
+Content-Type: application/x-javascript
+Content-Length: 13061
+Last-modified: Fri Mar  9 13:34:56 2018
+ original-response-headers Server: nginx
+Date: Thu, 09 Jan 2025 08:34:13 GMT
+Content-Type: application/x-javascript
+Content-Length: 13061
+Connection: keep-alive
+Last-modified: Fri Mar  9 13:34:56 2018
+ ctid 2 uncompressed-len 0   3

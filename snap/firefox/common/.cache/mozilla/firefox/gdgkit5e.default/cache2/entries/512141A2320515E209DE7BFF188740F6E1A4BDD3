@@ -1,0 +1,391 @@
+angularapp = angular.module('vs', []);
+
+angularapp.controller('snmp_config_ctrl', function($scope, $http, $timeout, vs_helper) {
+	$scope.isSaving = false;
+	$scope.isLoading = true;
+	$scope.config = {};
+	$scope.network1 = '0.0.0.0'
+	$scope.network2 = '0'
+	$scope.networkv6_ip = '::'
+	$scope.networkv6_length = '0'
+	$scope.show_traps = {};
+	$scope.savingMessage = "";
+	$scope.text_color = 'color: black;'
+	$scope.button_disabled = false;
+	$scope.community_string_info = 'For v1 and v2c only'; 
+
+	var sip_traps = {
+					'IP-Station Started':{help:'The device has started'},
+					'Registration Successfull':{help:'Device has successfully registered with a SIP server'},
+					'Registration Failed':{help:'Device failed to register with a SIP server'},
+					'Call Connected':{help:'Call has connected successfully'},
+					'Call Connect Failed':{help:'Call has failed to connect'},
+					'Call Disconnect':{help:'Call has disconnected'}
+					};
+
+	var sip_rcio_traps = {
+					'Input Button Pressed':{help:'Input button was pressed. Trap description will provide more info about input number.'},
+					'Input Button Released':{help:'Input button was released. Trap description will provide more info about input number.'}
+					}
+
+	var sip_traps_stations = {
+					'Dak Pressed':{help:'DAK was pressed. Trap description will provide more info about DAK number.'},
+					'Dak Released':{help:'DAK was released. Trap description will provide more info about DAK number.'},
+					'Relay Activated':{help:'Relay was activated. Trap description will provide more info about relay number.'},
+					'Relay Deactivated':{help:'Relay was deactivated. Trap description will provide more info about relay number.'},
+					'Button Hanging':{help:'Button was pushed for more than 10 seconds without being released'},
+					'Sound Test Failed':{help:'Sound test failed'},
+					'Sound Test Error':{help:'Automatically setting sound pressure level failed'},
+					'Sound Test Success':{help:'Sound test was successful'},
+					};
+
+	var amp_fault_traps = { 
+					'Missing Amplifier Module':{help:'Amplifier module is missing.'},
+					'PSU Voltage Fault':{help:'Power supply voltage is not within operational range. Trap description will provide more information about voltage values.'},
+					'Amplifier Shutdown':{help:'Amplifier audio channel is shut down. Trap description will provide details about affected channel.'},
+					'Speaker Line Monitoring Fault':{help:'Reported only if Speaker Line Monitoring (SLM) enabled and configured. Line monitoring related faults like line open, shorted, load changeâ€¦ Trap description will provide fault details and affected channel.'},
+					'Overtemperature':{help:'High temperature detected. Trap description will provide more info about value and affected sensor.'},
+					'Amplifier Disabled':{help:'Amplifier audio channel is disabled. Trap description will provide details about affected channel.'}
+					};
+
+	var fuse_fault_traps = { 
+					'Fuse Broken':{help:'Fuse is broken. Trap description will provide information about affected fuse.'}
+					}
+
+	var rcio_fault_traps = { 
+					'RCO Fault':{help:'Reported only if RCO monitoring enabled. Control output is not set or cleared. Trap description will provide more info about affected output and fault details.'},
+					'RCI Fault':{help:'Reported only if RCI monitoring enabled. Control input shorted or not connected. Trap description will provide more info about affected input and fault details.'}
+					};
+					
+	var line_in_fault_traps = {
+					'Line In Fault':{help:'Reported only if Line In monitoring enabled. Line in is disconnected.'}
+					}
+					
+	var line_voltage_fault_traps = { 
+					'Selected Line Voltage Fault':{help:'Selected line voltage is not applied.'}
+					}
+
+	var cooling_fan_fault_traps = {
+					'Cooling Fan Fault':{help:'There is a cooling fan fault eg. low speed, not running. Trap description will provide RPM and fan details.'}
+					};
+					
+	var let_fault_traps = {
+					'LET Fault':{help:'Reported only if LET monitoring enabled and configured. LET has failed. Trap description will provide let channel and number.'}
+					};
+
+	var power_supply_fault_traps = {
+					'AC Power Fault':{help:'Reported only if AC Power monitoring enabled. AC power disconnected.'},
+					'DC Power Fault':{help:'Reported only if DC Power monitoring enabled. DC power disconnected.'}
+					};
+					
+	var mic_fault_traps = {
+					'Microphone Error':{help:'Reported only if mic monitoring is enabled. Microphone is not connected or shorted. Trap description will provide fault details'}
+					}
+
+	var ecpir_fault_traps = {
+					'Missing EMBDR Module':{help:'Panel device is missing expansion modules.'}
+					};
+
+	var sw_fault_traps = {
+					'Software Fault':{help:'Software daemon has stopped working. Trap description will provide more info about affected daemon.'}
+					};
+					
+	var eth_switch_fault_traps = {
+					'ETH Port Disconnected':{help:'Reported only if ETH port monitoring enabled. Ethernet port is disconnected. Trap description will provide more info about affected port number.'}
+					};
+					
+	var custom_traps = {
+					'Custom Fault':{help:'Report External Custom Faults. Trap description will provide more info about fault.'}
+					};
+
+	// Makes sure that we only use alphanumeric characters for a password.
+	$scope.checkPwCharacters = function()
+	{
+		let pw_value = $scope.config.snmp_settings.access_control.community;
+
+		if (!pw_value.match(/^[0-9a-z]+$/i))
+		{
+			$scope.button_disabled = true;
+			$scope.community_string_info = 'Error: Alphanumeric characters only.';
+			$scope.text_color = 'color: red;' 
+		} else 
+		{
+			$scope.button_disabled = false;
+			$scope.community_string_info = 'For v1 and v2c only'; 
+			$scope.text_color = 'color: black;'
+		}
+	}
+
+	$scope.saveDataSnmp = function()
+	{
+		$scope.isSaving = true;
+		join_cdir_ip();
+		save_traps();
+		var zap_put = {};
+		zap_put['snmp_settings'] = $scope.config.snmp_settings;
+		$http({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ edit: 'edit', path: '/config/snmp_settings', op:'patch', data: angular.toJson(zap_put)}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			$scope.isSaving = false;
+			$scope.refreshData();
+		}, function errorCallback(response) {
+			console.log(response);
+			$scope.savingMessage = "error. Please refresh page!"
+		});
+	}
+
+	$scope.refreshData = function()
+	{
+		$http ({
+			method: 'POST',
+			url: '/goform/zForm_auto_config',
+			data: jQuery.param({ get: 'get', path: 'state/config/snmp_settings' }),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		}).then(function successCallback(response) {
+			got_data = angular.fromJson(angular.toJson(response.data.out.get.data))
+			$scope.config = got_data;
+			load_traps();
+			split_cdir_ip();
+			$scope.isLoading = false;
+		}, function errorCallback(response) {
+			console.log(response);
+		});
+	}
+
+	$scope.getAllData = function ()
+	{
+		var helperLoaded = vs_helper.load();
+		helperLoaded.then(function () {
+			$scope.refreshData();
+		});
+	};
+
+	load_traps = function()
+	{
+		$scope.show_traps = [];
+		var powerSource = vs_helper.getDevicePowerSource();
+		var signallingMode = vs_helper.getSignallingMode();
+
+		if(signallingMode == 'sip' || signallingMode == 'pulse')
+		{
+			if(vs_helper.deviceIsAmplifier())
+				create_trap_config(custom_traps);
+
+			create_trap_config(sip_traps);
+			if (!vs_helper.deviceIsAmplifier()) //only for stations
+				create_trap_config(sip_traps_stations);
+			if (vs_helper.deviceHasRcio())
+				create_trap_config(sip_rcio_traps);
+		}
+
+		if(vs_helper.deviceIsAmplifier())
+			create_trap_config(amp_fault_traps);
+
+		if (powerSource == 'ACDC') //no point displaying traps for only one power source missing since if it is missing, device is off
+			create_trap_config(power_supply_fault_traps);
+
+		if (vs_helper.deviceHasEthSwitch())
+			create_trap_config(eth_switch_fault_traps);
+
+		if(vs_helper.getDeviceModel() == 'Stentofon Turbine Extended - EXIGO Panel') //ECPIR, EAPIR
+			create_trap_config(ecpir_fault_traps);
+
+		if(vs_helper.deviceHasCoolingFan())
+			create_trap_config(cooling_fan_fault_traps);
+
+		if(vs_helper.deviceHasLineVoltageSelection())
+			create_trap_config(line_voltage_fault_traps);
+
+		if(vs_helper.deviceHasLetMonitoring())
+			create_trap_config(let_fault_traps);
+
+		if(vs_helper.deviceHasMicMonitoring())
+			create_trap_config(mic_fault_traps);
+
+		if(vs_helper.deviceHasLineInMonitoring())
+			create_trap_config(line_in_fault_traps);
+
+		if(vs_helper.deviceHasRcioMonitoring() && vs_helper.deviceHasRcio())
+			create_trap_config(rcio_fault_traps);
+
+		if(vs_helper.deviceHasFuseMonitoring())
+			create_trap_config(fuse_fault_traps);
+
+		create_trap_config(sw_fault_traps); //all Turbine based devices
+
+		function create_trap_config(trap_array)
+		{
+			for (trap_name in trap_array) {
+				var show_trap = {'name':trap_name, 'enabled':false, 'help':trap_array[trap_name].help};
+				if ($scope.config.snmp_settings.trap_settings.hasOwnProperty('traps') && $scope.config.snmp_settings.trap_settings.traps.hasOwnProperty('trap'))
+				{
+					for (var j = 0; j < $scope.config.snmp_settings.trap_settings.traps.trap.length; j++) {
+						if ($scope.config.snmp_settings.trap_settings.traps.trap[j].name == trap_name) {
+							show_trap.enabled = $scope.config.snmp_settings.trap_settings.traps.trap[j].enabled
+							break;
+						}
+					}
+				}
+				$scope.show_traps.push(show_trap);
+			}
+		}
+
+		function search_array_kid(kid, array)
+		{
+			for (var i=0; i < array.length; i++)
+			{
+				if (array[i].kid === kid)
+					return i;
+			}
+			return -1;
+		}
+	}
+
+	$scope.select_all_traps = function()
+	{
+		for (var i = 0; i < $scope.show_traps.length; i++) {
+			$scope.show_traps[i].enabled = $scope.selectalltraps;
+		}
+	}
+
+	$scope.deviceIsIpv6Ready = function()
+	{
+		return vs_helper.deviceIsIpv6Ready();
+	}
+
+	save_traps = function()
+	{
+		$scope.config.snmp_settings.trap_settings.traps = {};
+		var save_traps = [];
+		for (var i = 0; i < $scope.show_traps.length; i++) {
+			var trap = {};
+			trap.name = $scope.show_traps[i].name;
+			trap.enabled = $scope.show_traps[i].enabled;
+			save_traps.push(trap);
+		}
+		$scope.config.snmp_settings.trap_settings.traps.trap = save_traps;
+	}
+
+	split_cdir_ip = function()
+	{
+		var network = $scope.config.snmp_settings.access_control.nms_ip.split("/")
+		$scope.network1 = network[0];
+		$scope.network2 = network[1];
+		$scope.validateIpMask()
+		var networkv6 = $scope.config.snmp_settings.access_control.nms_ipv6.split("/")
+		$scope.networkv6_ip = networkv6[0];
+		$scope.networkv6_length = networkv6[1];
+	}
+
+	join_cdir_ip = function()
+	{
+		if ($scope.mask_error_txt == "")
+		{
+			$scope.config.snmp_settings.access_control.nms_ip = $scope.network1 + '/' + $scope.network2;
+		}
+		
+		$scope.config.snmp_settings.access_control.nms_ipv6 = $scope.networkv6_ip + '/' + $scope.networkv6_length;
+	}
+
+	$scope.validateIpMask = function()
+	{
+		var validatedIP = validate_mask();
+		if (validatedIP == "0")
+			$scope.mask_error_txt = "IP and mask are not correct.";
+		else
+		{
+			if (validatedIP == $scope.network1)
+			{
+				$scope.mask_error_txt = "";
+			}
+			else
+			{
+				$scope.mask_error_txt = "IP is not supported for this mask. Supported form is " + validatedIP;
+			}
+		}
+
+		function validate_ip(ip)
+		{
+			var arrayips = ip.split(".");
+			if (arrayips.length == 4)
+			{
+				var ippart1 = parseInt(arrayips[0]);
+				var ippart2 = parseInt(arrayips[1]);
+				var ippart3 = parseInt(arrayips[2]);
+				var ippart4 = parseInt(arrayips[3]);
+				if (!isNaN(ippart1) && !isNaN(ippart2) && !isNaN(ippart3) && !isNaN(ippart4))
+				{
+					if (ippart1>= 0 && ippart1<= 255 
+					&& ippart2>= 0 && ippart2<= 255
+					&& ippart3>= 0 && ippart3<= 255
+					&& ippart4>= 0 && ippart4<= 254)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		function validate_mask()
+		{
+			var ip = $scope.network1;
+			var maskNum = $scope.network2;
+			if (!((maskNum == "" || isNaN(maskNum)) && ip == "0.0.0.0"))
+			{
+				var parsedMaskNum = parseInt(maskNum);
+				if (!isNaN(parsedMaskNum))
+				{
+					if (parsedMaskNum >=0 && parsedMaskNum<=32)
+					{
+						if (validate_ip(ip))
+						{
+							var mask = CDIR2netmask(maskNum);
+							var newIp = split_ip(ip,mask);
+							return newIp;
+						}
+					}
+				}
+			}
+			return "0"
+		}
+
+		function split_ip(ip,mask)
+		{
+			var arrayips = ip.split(".");
+			var arraymask = mask.split(".");
+			return (parseInt(arrayips[0])&parseInt(arraymask[0])).toString() +"." + (parseInt(arrayips[1])&parseInt(arraymask[1])).toString() +
+			"." + (parseInt(arrayips[2])&parseInt(arraymask[2])).toString() +"." + (parseInt(arrayips[3])&parseInt(arraymask[3])).toString()
+		}
+
+		function CDIR2netmask(bitCount) 
+		{
+			var mask=[];
+			for(var i=0;i<4;i++) {
+				var n = Math.min(bitCount, 8);
+				mask.push(256 - Math.pow(2, 8-n));
+				bitCount -= n;
+			}
+			return mask.join('.');
+		}
+	}
+
+	$scope.getAllData();
+});
+
+¢–*”ö0           gë½{HN·gë½{   e    O^partitionKey=%28http%2C10.50.93.17%29,:http://10.50.93.17/snmp_configuration_new.js?version=7.2.3.0 strongly-framed 1 request-method GET auth Basic response-head HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 09 Jan 2025 08:31:33 GMT
+Content-Type: application/x-javascript
+Content-Length: 12927
+Last-modified: Fri Mar  9 13:34:56 2018
+ original-response-headers Server: nginx
+Date: Thu, 09 Jan 2025 08:31:33 GMT
+Content-Type: application/x-javascript
+Content-Length: 12927
+Connection: keep-alive
+Last-modified: Fri Mar  9 13:34:56 2018
+ ctid 2 uncompressed-len 0   2
