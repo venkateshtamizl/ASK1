@@ -393,3 +393,4 @@ cat docker-compose.yml
 ls
 cat Dockerfile 
 ls
+ip a
