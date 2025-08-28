@@ -3,5 +3,5 @@
 # ibus session bus with the below address.
 # If the IBUS_ADDRESS environment variable is set, it will
 # be used rather than this file.
-IBUS_ADDRESS=unix:path=/home/atgin-srv-ask/.cache/ibus/dbus-yRSYP2K9,guid=5afd42c6bcf617b7ce0eec69686f5c5f
-IBUS_DAEMON_PID=2840
+IBUS_ADDRESS=unix:path=/home/atgin-srv-ask/.cache/ibus/dbus-U7vDGL1q,guid=7d9e46f73dc2db154e1a05d768a9b928
+IBUS_DAEMON_PID=2732

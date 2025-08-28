@@ -104,10 +104,10 @@ UpgradeToolSignature: http://archive.ubuntu.com/ubuntu/dists/jammy-updates/main/
 
 Dist: noble
 Name: Noble Numbat
-Version: 24.04.2 LTS
+Version: 24.04.3 LTS
 Date: Thu, 25 April 2024 23:59:59 UTC
 Supported: 1
-Description: This is the 24.04.2 LTS release
+Description: This is the 24.04.3 LTS release
 Release-File: http://archive.ubuntu.com/ubuntu/dists/noble-updates/Release
 ReleaseNotes: http://archive.ubuntu.com/ubuntu/dists/noble-updates/main/dist-upgrader-all/current/ReleaseAnnouncement
 ReleaseNotesHtml: http://archive.ubuntu.com/ubuntu/dists/noble-updates/main/dist-upgrader-all/current/ReleaseAnnouncement.html
